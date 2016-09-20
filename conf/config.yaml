@@ -1,0 +1,29 @@
+db : {
+    type     : "mysql"
+    user     : "root"
+    password : "root"
+    host     : "localhost:3306"
+    database : "notice"
+    prefix   : "a_"
+    options  : {}
+    debug    : true
+}
+
+cron : {
+    interval : 1 # 间隔频率(单位：分钟)
+}
+
+log : {
+    debug        : true
+	colorable    : false
+	saveFile     : "logs/{date:20060102}.log" # 按天分割日志
+	fileMaxBytes : 10485760 # 10M 按尺寸分割文件
+	targets      : "console,file"
+}
+
+sys : {
+    accounts     : {
+        # 管理员账号和密码
+        admin    : "admin"
+    }
+}
