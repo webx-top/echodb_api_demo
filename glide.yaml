@@ -1,0 +1,16 @@
+package: github.com/webx-top/echodb_api_demo
+import:
+- package: github.com/admpub/confl
+- package: github.com/admpub/log
+- package: github.com/howeyc/fsnotify
+- package: github.com/webx-top/db
+  subpackages:
+  - lib/factory
+  - mongo
+  - mysql
+- package: github.com/webx-top/echo
+  subpackages:
+  - engine/standard
+  - middleware
+  - middleware/session
+- package: github.com/webx-top/validation
