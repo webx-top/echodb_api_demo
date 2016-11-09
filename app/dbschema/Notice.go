@@ -9,6 +9,7 @@ import (
 )
 
 type Notice struct {
+	param   *factory.Param
 	trans	*factory.Transaction
 	objects []*Notice
 	
@@ -41,36 +42,70 @@ func (this *Notice) NewObjects() *[]*Notice {
 	return &this.objects
 }
 
-func (this *Notice) Param() *factory.Param {
+func (this *Notice) NewParam() *factory.Param {
 	return factory.NewParam(factory.DefaultFactory).SetTrans(this.trans).SetCollection("notice").SetModel(this)
+}
+
+func (this *Notice) SetParam(param *factory.Param) factory.Model {
+	this.param = param
+	return this
+}
+
+func (this *Notice) Param() *factory.Param {
+	if this.param == nil {
+		return this.NewParam()
+	}
+	return this.param
 }
 
 func (this *Notice) Get(mw func(db.Result) db.Result, args ...interface{}) error {
 	return this.Param().SetArgs(args...).SetRecv(this).SetMiddleware(mw).One()
 }
 
-func (this *Notice) List(recv interface{},mw func(db.Result) db.Result, page, size int, args ...interface{}) (func() int64, error) {
+func (this *Notice) List(recv interface{}, mw func(db.Result) db.Result, page, size int, args ...interface{}) (func() int64, error) {
 	if recv == nil {
 		recv = this.NewObjects()
 	}
 	return this.Param().SetArgs(args...).SetPage(page).SetSize(size).SetRecv(recv).SetMiddleware(mw).List()
 }
 
-func (this *Notice) ListByOffset(recv interface{},mw func(db.Result) db.Result, offset, size int, args ...interface{}) (func() int64, error) {
+func (this *Notice) ListByOffset(recv interface{}, mw func(db.Result) db.Result, offset, size int, args ...interface{}) (func() int64, error) {
 	if recv == nil {
 		recv = this.NewObjects()
 	}
 	return this.Param().SetArgs(args...).SetOffset(offset).SetSize(size).SetRecv(recv).SetMiddleware(mw).List()
 }
 
-func (this *Notice) Add() (interface{}, error) {
+func (this *Notice) Add() (pk interface{}, err error) {
 	this.Created = uint(time.Now().Unix())
-	return this.Param().SetSend(this).Insert()
+	this.Id = 0
+	pk, err = this.Param().SetSend(this).Insert()
+	if err == nil && pk != nil {
+		if v, y := pk.(uint64); y {
+			this.Id = v
+		}
+	}
+	return
 }
 
 func (this *Notice) Edit(mw func(db.Result) db.Result, args ...interface{}) error {
 	
 	return this.Param().SetArgs(args...).SetSend(this).SetMiddleware(mw).Update()
+}
+
+func (this *Notice) Upsert(mw func(db.Result) db.Result, args ...interface{}) (pk interface{}, err error) {
+	pk, err = this.Param().SetArgs(args...).SetSend(this).SetMiddleware(mw).Upsert(func(){
+		
+	},func(){
+		this.Created = uint(time.Now().Unix())
+	this.Id = 0
+	})
+	if err == nil && pk != nil {
+		if v, y := pk.(uint64); y {
+			this.Id = v
+		}
+	}
+	return 
 }
 
 func (this *Notice) Delete(mw func(db.Result) db.Result, args ...interface{}) error {
