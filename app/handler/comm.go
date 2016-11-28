@@ -27,7 +27,7 @@ func JSON(c echo.Context, data interface{}, err error) error {
 	} else if data != nil {
 		a.Data = data
 	}
-	return c.JSON(200, a)
+	return c.JSON(a)
 }
 
 func JSONList(c echo.Context, data interface{}, cnt func() int64, page int, size int) error {

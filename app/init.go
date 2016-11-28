@@ -75,7 +75,7 @@ func login(c echo.Context, saveSession bool) error {
 
 func addRouter(e *echo.Echo) {
 	e.Get(`/`, func(c echo.Context) error {
-		return c.String(200, `OK`)
+		return c.String(`OK`)
 	})
 	e.Get(`/notice/list`, NoticeList, authCheck)
 	e.Post(`/notice/add`, NoticeAdd, authCheck)
